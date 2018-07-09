@@ -254,24 +254,24 @@ describe('POST /users', () => {
     });
 
 
-//    it('should return validation errors if request invalid', (done) => {
-//        var email = 'xhdg';
-//        var password = '1gaga'
-//        request(app)
-//            .post('/users')
-//            .send({ email, password })
-//            .expect(400)
-//            .end(done);
+    it('should return validation errors if request invalid', (done) => {
+        var email = 'xhdg';
+        var password = '1gaga'
+        request(app)
+            .post('/users')
+            .send({ email, password })
+            .expect(400)
+            .end(done);
 
-//    });
-//});
+    });
+});
 
-//    it('should not create user if email is in use', (done) => {
-//        var email = 'jen@example.com';
-//        var password = '1'
-//        request(app)
-//            .post('/users')
-//            .send({ email, password })
-//            .expect(400)
-//            .end(done);
-//    });
+    it('should not create user if email is in use', (done) => {
+        var email = 'jen@example.com';
+        var password = '1'
+        request(app)
+            .post('/users')
+            .send({ email, password })
+            .expect(400)
+            .end(done);
+    });
