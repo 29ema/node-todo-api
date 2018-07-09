@@ -7,6 +7,6 @@
     "\\server\\tests",
     "\\server\\tests\\seed"
   ],
-  "SelectedNode": "\\server\\tests\\seed\\seed.js",
-  "PreviewInSolutionExplorer": false
+  "SelectedNode": "\\server\\tests\\server.test.js",
+  "PreviewInSolutionExplorer": true
 }
