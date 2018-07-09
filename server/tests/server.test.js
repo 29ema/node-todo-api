@@ -266,12 +266,12 @@ describe('POST /users', () => {
     });
 });
 
-    //it('should not create user if email is in use', (done) => {
-    //    var email = 'jen@example.com';
-    //    var password = '1'
-    //    request(app)
-    //        .post('/users')
-    //        .send({ email, password })
-    //        .expect(400)
-    //        .end(done);
-    //});
+    it('should not create user if email is in use', (done) => {
+        var email = 'jen@example.com';
+        var password = '1'
+        request(app)
+            .post('/users')
+            .send({ email, password })
+            .expect(400)
+            .end(done);
+    });
