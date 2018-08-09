@@ -25,15 +25,15 @@ var todos= db.collection('Todos');
 //         console.log(err);
 //     });
 
-users.findOneAndUpdate({_id:new ObjectID('5b6aa8faac1cb537d4d3ff3e')},
-    {$set:{
-        name:'Ema',
-    },
-    $inc:{
-        'age': 1
-    }},{
-        returnOriginal:false
-    }).then((res)=>{
+users.findOneAndUpdate(
+    {_id:new ObjectID('5b6aa8faac1cb537d4d3ff3e')},
+    {
+    $set:{name:'Ema',},
+    $inc:{'age': 1}
+    },{
+    returnOriginal:false
+    }
+    ).then((res)=>{
         console.log(res);
     })
     db.close();

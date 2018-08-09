@@ -9,15 +9,18 @@ const todos=[{
     _id: new ObjectID(),
     text: "first test"
 },{
-    text: "second test"
+    text: "second test",
+    // completed:true,
+    // completedAt: 123
 }]
 
 beforeEach((done)=>{
     Todo.remove({}).then(()=>{
-        return Todo.insertMany(todos);
+    return Todo.insertMany(todos);
+        
     }).then(()=>{
         done();
-    },(e)=>{console.log(e)});
+    },(e)=>{console.log(e); done(e);});
 });
 
 describe('POST/todos', ()=>{
@@ -84,7 +87,7 @@ describe('GET/todos/:id',()=>{
 
     it('should return 404 if todo not found',(done)=>{
         request(app)
-        .get(`/todos/:${new ObjectID().toHexString()}`)
+        .get(`/todos/${new ObjectID().toHexString()}`)
         .expect(404)
         .expect((res)=>{
             expect(res.body).toEqual({});
@@ -93,12 +96,85 @@ describe('GET/todos/:id',()=>{
 
     it('should return 404 for non-object ids',(done)=>{
         request(app)
-        .get('/todos/:123abc')
+        .get('/todos/123abc')
+        .expect(404)
+        .expect((res)=>{
+            expect(res.body).toEqual({});
+        }).end(done);
+    });
+});
+
+describe('DELETE/todos/:id',()=>{
+    var hexId= todos[0]._id.toHexString();
+    
+    it('should remove a todo',(done)=>{
+        request(app)
+        .delete(`/todos/${hexId}`)
+        .expect(200)
+        .expect((res)=>{
+        
+            expect(res.body.todo._id).toEqual(hexId);
+        })
+        .end((err,res)=>{
+            if(err){return done(err);}
+            Todo.findById(hexId).then((todo)=>{
+                expect(todo).toBeFalsy();
+                done();
+            }).catch((e)=>done(e))
+        });
+    });
+
+    it('should return 404 if todo not found',(done)=>{
+        request(app)
+        .delete(`/todos/:${hexId}`)
         .expect(404)
         .expect((res)=>{
             expect(res.body).toEqual({});
         }).end(done);
     });
 
+    it('should return 404 for non-object ids',(done)=>{
+        request(app)
+        .delete('/todos/123abc')
+        .expect(404)
+        .expect((res)=>{
+            expect(res.body).toEqual({});
+        }).end(done);
+    });
+});
+
+describe('PATCH/todos/:id',()=>{
+    var hexId= todos[0]._id.toHexString();
+    
+
+    it('should update the todo',(done)=>{
+        var body={text:"testing set",completed:true};
+        request(app)
+        .patch(`/todos/${hexId}`)
+        .send(body)
+        .expect(200)
+        .expect((res)=>{
+            expect(res.body.todo.text).toEqual(body.text);
+            expect(res.body.todo.completed).toEqual(true);
+            expect(typeof res.body.todo.completedAt).toBe('number');
+        }).end(done);
+    });
+
+
+
+    it('should clear completedAt when todo is not completed',(done)=>{
+        var body={text:"testing 2",completed:false};
+        request(app)
+        .patch(`/todos/${hexId}`)
+        .send(body)
+        .expect(200)
+        .expect((res)=>{
+            expect(res.body.todo.text).toEqual(body.text);
+            expect(res.body.todo.completed).toEqual(false);
+            expect(res.body.todo.completedAt).toBe(null);
+        }).end(done);
+
+    });
+    
 
 });
