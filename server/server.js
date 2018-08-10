@@ -4,12 +4,14 @@ require('./config/config');
 const _= require('lodash');
 const express= require('express');
 const bodyParser= require('body-parser');
-const {ObjectID}= require('mongodb')
+const {ObjectID}= require('mongodb');
+const {authenticate}= require('./middleware/authenticate');
 
 
-const {mongoose}= require('./db/mongoose.js')
-const {Todo}= require('./models/todo.js')
-const {User}= require('./models/user.js')
+const {mongoose}= require('./db/mongoose.js');
+const {Todo}= require('./models/todo.js');
+const {User}= require('./models/user.js');
+const bcrypt=require('bcryptjs');
 
 const port= process.env.PORT;
 var app= express();
@@ -89,12 +91,10 @@ app.patch('/todos/:id', (req,res)=>{
 });
 
 //--------------------------------------------------------------------------
-
 app.post('/users',(req,res)=>{
     var user= new User(_.pick(req.body,['email','password']));
     user.save().then(()=>{
-        return user.generateAuthToken();
-        // returns a token kur e ruan nje user
+        return user.generateAuthToken();    
     }).then((token)=>{
         res.header('x-auth', token).send(user);
     }).catch((e)=>{
@@ -102,9 +102,23 @@ app.post('/users',(req,res)=>{
     });
 });
 
+//log in 
+app.post('/users/login',(req,res)=>{
+    var body= new User(_.pick(req.body,['email','password']));
+    User.findByCredentials(body.email,body.password).then((user)=>{
+        return user.generateAuthToken().then((token)=>{
+            res.header('x-auth',token).send(user);
+        });
+    }).catch((e)=>{
+        res.status(400).send();
+
+    })
+});
 
 
-
+app.get('/users/me',authenticate, (req,res)=>{
+    res.send(req.user);
+});
 
 app.listen(port, ()=>{
     console.log(`Started on port ${port}`);
